@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare — Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --cream: #f8f5f0;
+    --slate: #334155;
+    --muted: #94a3b8;
+    --white: #ffffff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    width: 100%; max-width: 520px;
+    padding: 50px;
+    box-shadow: 0 25px 80px rgba(10,22,40,0.08);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); }
+  h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+  /* Style Django form as_p output */
+  form p { margin-bottom: 18px; }
+  form p label { display: block; font-size: 12px; font-weight: 500; color: var(--slate); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 7px; }
+  form p input, form p select {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--navy);
+    background: var(--white);
+    transition: all 0.2s;
+    outline: none;
+  }
+  form p input:focus, form p select:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(13,148,136,0.1); }
+  form p .helptext { display: block; font-size: 12px; color: var(--muted); margin-top: 5px; }
+  form p ul.errorlist { list-style: none; margin-top: 4px; }
+  form p ul.errorlist li { color: #ef4444; font-size: 12px; }
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(13,148,136,0.35); }
+  .login-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--muted); }
+  .login-link a { color: var(--teal); text-decoration: none; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">⚕️</div>
+    <span class="logo-text">MediCare</span>
+  </div>
+  <h2>Create Account</h2>
+  <p class="subtitle">Join the MediCare platform today</p>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn-primary">Create Account</button>
+  </form>
+  <p class="login-link">Already have an account? <a href="/login/">Sign in</a></p>
+</div>
+</body>
+</html>

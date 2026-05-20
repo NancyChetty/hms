@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare — Doctor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy2: #0f2447;
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --teal-pale: #f0fdfa;
+    --cream: #f8f5f0;
+    --slate: #334155;
+    --muted: #94a3b8;
+    --border: #e2e8f0;
+    --white: #ffffff;
+    --sidebar-w: 260px;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --blue: #3b82f6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    min-height: 100vh;
+    position: fixed; top: 0; left: 0;
+    display: flex; flex-direction: column;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text { font-family: 'Playfair Display', serif; color: white; font-size: 20px; }
+  .sidebar-nav { flex: 1; padding: 20px 12px; }
+  .nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 12px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 3px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+  .nav-item.active { background: rgba(13,148,136,0.2); color: var(--teal-light); }
+  .nav-item .icon { font-size: 17px; width: 22px; text-align: center; }
+  .sidebar-profile {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 15px;
+    flex-shrink: 0;
+  }
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name { color: white; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .profile-role { color: rgba(255,255,255,0.35); font-size: 11px; }
+  .logout-btn { color: rgba(255,255,255,0.3); font-size: 16px; cursor: pointer; text-decoration: none; transition: color 0.2s; }
+  .logout-btn:hover { color: var(--red); }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+
+  /* TOPBAR */
+  .topbar {
+    background: white;
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .notif-btn {
+    position: relative; background: none; border: none; cursor: pointer;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #f8fafc; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: background 0.2s;
+  }
+  .notif-btn:hover { background: var(--teal-pale); }
+  .notif-badge {
+    position: absolute; top: 6px; right: 6px;
+    width: 8px; height: 8px; background: var(--red);
+    border-radius: 50%; border: 1.5px solid white;
+  }
+  .date-chip { background: #f8fafc; border: 1px solid var(--border); padding: 6px 14px; border-radius: 8px; font-size: 13px; color: var(--muted); }
+  .create-btn {
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    color: white; border: none; padding: 9px 18px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .create-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(13,148,136,0.3); }
+
+  /* CONTENT */
+  .content { padding: 32px; }
+
+  /* STATS CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+  .stat-card {
+    background: white; border-radius: 16px; padding: 22px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+  }
+  .stat-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .stat-icon.teal { background: var(--teal-pale); }
+  .stat-icon.amber { background: #fffbeb; }
+  .stat-icon.green { background: #f0fdf4; }
+  .stat-icon.blue { background: #eff6ff; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  /* TWO-COL GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .full-width { grid-column: 1 / -1; }
+
+  /* SECTION CARD */
+  .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--navy); }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-teal { background: var(--teal-pale); color: var(--teal); }
+  .badge-amber { background: #fffbeb; color: var(--amber); }
+  .badge-red { background: #fef2f2; color: var(--red); }
+  .badge-blue { background: #eff6ff; color: var(--blue); }
+
+  /* SLOTS TABLE */
+  .slot-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .slot-row:last-child { border-bottom: none; }
+  .slot-time { display: flex; align-items: center; gap: 10px; }
+  .slot-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+  .slot-text { font-size: 14px; color: var(--slate); font-weight: 400; }
+  .slot-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    padding: 5px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+    border: none; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-edit { background: #eff6ff; color: var(--blue); }
+  .btn-edit:hover { background: #dbeafe; }
+  .btn-del { background: #fef2f2; color: var(--red); }
+  .btn-del:hover { background: #fee2e2; }
+  .empty-msg { color: var(--muted); font-size: 14px; text-align: center; padding: 30px 0; }
+
+  /* BOOKINGS */
+  .booking-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid #f8fafc;
+  }
+  .booking-row:last-child { border-bottom: none; }
+  .patient-av {
+    width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .booking-info { flex: 1; }
+  .booking-name { font-size: 14px; color: var(--navy); font-weight: 500; }
+  .booking-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .status-cancelled {
+  background: #fef2f2;
+  color: var(--red);
+}
+.status-confirmed {
+  background: #ecfeff;
+  color: #0891b2;
+}
+
+  /* NOTIFICATIONS */
+  .notif-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid #f8fafc;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .notif-dot.new { background: var(--teal); }
+  .notif-dot.old { background: #e2e8f0; }
+  .notif-text { font-size: 13px; color: var(--slate); line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* HISTORY TABLE */
+  .history-table { width: 100%; border-collapse: collapse; }
+  .history-table th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); padding: 0 12px 12px; }
+  .history-table td { padding: 13px 12px; font-size: 13px; color: var(--slate); border-top: 1px solid #f8fafc; }
+  .status-chip { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; display: inline-block; }
+  .status-completed { background: #f0fdf4; color: var(--green); }
+  .status-cancelled { background: #fef2f2; color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚕️</div>
+    <span class="logo-text">MediCare</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" href="#"><span class="icon">🏠</span> Dashboard</a>
+    <a class="nav-item" href="{% url 'create_slot' %}"><span class="icon">➕</span> Create Slot</a>
+    <a class="nav-item" href="#slots"><span class="icon">🗓️</span> My Slots</a>
+    <a class="nav-item" href="#bookings"><span class="icon">📋</span> Bookings</a>
+    <div class="nav-section-label">Account</div>
+    <a class="nav-item" href="#"><span class="icon">👤</span> Profile</a>
+    <a class="nav-item" href="#notifications"><span class="icon">🔔</span> Notifications</a>
+    <a class="nav-item" href="#history"><span class="icon">📂</span> History</a>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="avatar">{{ request.user.username|first|upper }}</div>
+    <div class="profile-info">
+      <div class="profile-name">Dr. {{ request.user.username }}</div>
+      <div class="profile-role">Physician</div>
+    </div>
+    <a class="logout-btn" href="/logout/" title="Logout">↪</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <span class="topbar-title">Doctor Dashboard</span>
+    <div class="topbar-right">
+      <span class="date-chip">📅 Today</span>
+      <button class="notif-btn" onclick="document.getElementById('notifications').scrollIntoView({behavior:'smooth'})">
+        🔔<span class="notif-badge"></span>
+      </button>
+      <a href="{% url 'create_slot' %}" class="create-btn">➕ Create Slot</a>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon teal">🗓️</div>
+        <div><div class="stat-num" id="stat-slots">{{ slots|length }}</div><div class="stat-label">Total Slots</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div><div class="stat-num" id="stat-bookings">{{ bookings|length }}</div><div class="stat-label">Bookings</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">👥</div>
+        <div><div class="stat-num" id="stat-patients">{{ bookings|length }}</div><div class="stat-label">Total Patients</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">✅</div>
+        <div><div class="stat-num" id="stat-completed">0</div><div class="stat-label">Completed</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- SLOTS -->
+      <div class="card" id="slots">
+        <div class="card-header">
+          <span class="card-title">My Slots</span>
+          <span class="badge badge-teal">{{ slots|length }} Active</span>
+        </div>
+        {% for slot in slots %}
+        <div class="slot-row">
+          <div class="slot-time">
+            <span class="slot-dot"></span>
+            <span class="slot-text">{{ slot.start_time }} — {{ slot.end_time }}</span>
+          </div>
+          <div class="slot-actions">
+            <a href="{% url 'update_slot' slot.id %}" class="btn-sm btn-edit">✏️ Edit</a>
+            <a href="{% url 'delete_slot' slot.id %}" class="btn-sm btn-del">🗑️ Delete</a>
+          </div>
+        </div>
+        {% empty %}
+        <p class="empty-msg">No slots created yet.</p>
+        {% endfor %}
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="card" id="notifications">
+        <div class="card-header">
+          <span class="card-title">Notifications</span>
+          <span class="badge badge-red">{{ notifications|length }}</span>
+        </div>
+        <div class="notif-list">
+        {% for notif in notifications %}
+        <div class="notif-item">
+          <div class="notif-dot {% if not notif.is_read %}new{% else %}old{% endif %}"></div>
+          <div>
+            <div class="notif-text">{{ notif.message }}</div>
+            <div class="notif-time">{{ notif.created_at|timesince }} ago</div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="empty-msg">No notifications.</p>
+        {% endfor %}
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+<div class="card" id="bookings">
+  <div class="card-header">
+    <span class="card-title">Booking Requests</span>
+    <span class="badge badge-blue">{{ bookings|length }}</span>
+  </div>
+  <div class="booking-list">
+  {% for booking in bookings %}
+  {% if booking.status == 'pending' %}
+  <div class="booking-row">
+    <div class="patient-av">{{ booking.patient.username|first|upper }}</div>
+    <div class="booking-info">
+      <div class="booking-name">{{ booking.patient.username }}</div>
+      <div class="booking-time">⏰ {{ booking.slot.start_time }}</div>
+    </div>
+    <form method="POST" action="{% url 'update_booking_status' booking.id %}" style="display:flex;gap:8px;">
+      {% csrf_token %}
+      <button type="submit" name="status" value="confirmed" class="btn-sm btn-edit">Accept</button>
+      <button type="submit" name="status" value="cancelled" class="btn-sm btn-del">Reject</button>
+    </form>
+  </div>
+  {% endif %}
+  {% empty %}
+  <p class="empty-msg">No bookings yet.</p>
+  {% endfor %}
+  </div>
+</div>
+
+      <!-- UPCOMING APPOINTMENTS -->
+      <div class="card full-width" id="upcoming">
+        <div class="card-header">
+          <span class="card-title">Upcoming Appointments</span>
+          <span class="badge badge-teal">Confirmed</span>
+        </div>
+        <div class="booking-list">
+        {% for booking in bookings %}
+        {% if booking.status == 'confirmed' %}
+        <div class="booking-row">
+          <div class="patient-av">{{ booking.patient.username|first|upper }}</div>
+          <div class="booking-info">
+            <div class="booking-name">{{ booking.patient.username }}</div>
+            <div class="booking-time">⏰ {{ booking.slot.start_time }}</div>
+          </div>
+          <form method="POST" action="{% url 'complete_booking' booking.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-sm btn-edit">✅ Complete</button>
+          </form>
+          <form method="POST" action="{% url 'update_booking_status' booking.id %}" style="display:inline;margin-left:6px;">
+            {% csrf_token %}
+            <button type="submit" name="status" value="cancelled" class="btn-sm btn-del">✖ Cancel</button>
+          </form>
+        </div>
+        {% endif %}
+        {% empty %}
+        <p class="empty-msg">No upcoming appointments.</p>
+        {% endfor %}
+        </div>
+      </div>
+
+      <!-- PROFILE CARD -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">My Profile</span>
+          <a href="#" class="btn-sm btn-edit">✏️ Edit</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <div class="avatar" style="width:56px;height:56px;font-size:22px;border-radius:16px;">{{ request.user.username|first|upper }}</div>
+          <div>
+            <div style="font-weight:600;font-size:16px;color:var(--navy)">Dr. {{ request.user.username }}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:3px">Physician · MediCare Hospital</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Specialization</div>
+            <div style="font-size:13px;color:var(--slate);font-weight:500">General Medicine</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:12px;">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Department</div>
+            <div style="font-size:13px;color:var(--slate);font-weight:500">OPD</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HISTORY TABLE -->
+    <!-- HISTORY TABLE -->
+<div class="card full-width" id="history">
+
+  <div class="card-header">
+
+    <span class="card-title">
+      Booking History
+    </span>
+
+    <span class="badge badge-amber">
+      All Time
+    </span>
+
+  </div>
+
+  <table class="history-table">
+
+    <thead>
+
+      <tr>
+        <th>Patient</th>
+        <th>Date & Time</th>
+        <th>Duration</th>
+        <th>Status</th>
+      </tr>
+
+    </thead>
+
+    <tbody id="history-tbody">
+
+      {% for booking in bookings %}
+
+      {% if booking.status == 'completed' or booking.status == 'cancelled' %}
+
+      <tr>
+
+        <td>
+
+          <div style="display:flex;align-items:center;gap:10px;">
+
+            <div
+              class="patient-av"
+              style="width:30px;height:30px;font-size:11px;"
+            >
+              {{ booking.patient.username|first|upper }}
+            </div>
+
+            {{ booking.patient.username }}
+
+          </div>
+
+        </td>
+
+        <td>
+          {{ booking.slot.start_time }}
+        </td>
+
+        <td>
+          30 min
+        </td>
+
+        <td>
+
+          {% if booking.status == 'completed' %}
+
+          <span class="status-chip status-completed">
+            Completed
+          </span>
+
+          {% elif booking.status == 'cancelled' %}
+
+          <span class="status-chip status-cancelled">
+            Cancelled
+          </span>
+
+          {% endif %}
+
+        </td>
+
+      </tr>
+
+      {% endif %}
+
+      {% empty %}
+
+      <tr>
+
+        <td
+          colspan="4"
+          style="
+            text-align:center;
+            color:var(--muted);
+            padding:30px;
+          "
+        >
+
+          No history yet.
+
+        </td>
+
+      </tr>
+
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+
+  </div>
+</div>
+
+<script>
+const POLL_URL = "{% url 'dashboard_poll' %}";
+
+function getCsrf() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : '';
+}
+
+function renderDoctor(data) {
+
+  // --- STATS ---
+  if (data.stats) {
+    document.getElementById('stat-slots').textContent    = data.stats.total_slots;
+    document.getElementById('stat-bookings').textContent = data.stats.total_bookings;
+    document.getElementById('stat-patients').textContent = data.stats.total_patients;
+    document.getElementById('stat-completed').textContent= data.stats.completed;
+  }
+
+  // --- PENDING BOOKINGS ---
+  const pendingEl = document.querySelector('#bookings .booking-list');
+  if (pendingEl) {
+    if (!data.pending.length) {
+      pendingEl.innerHTML = '<p class="empty-msg">No bookings yet.</p>';
+    } else {
+      pendingEl.innerHTML = data.pending.map(b => `
+        <div class="booking-row">
+          <div class="patient-av">${b.patient[0].toUpperCase()}</div>
+          <div class="booking-info">
+            <div class="booking-name">${b.patient}</div>
+            <div class="booking-time">&#9200; ${b.time}</div>
+          </div>
+          <form method="POST" action="/update-booking-status/${b.id}/" style="display:flex;gap:8px;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrf()}">
+            <button type="submit" name="status" value="confirmed" class="btn-sm btn-edit">Accept</button>
+            <button type="submit" name="status" value="cancelled" class="btn-sm btn-del">Reject</button>
+          </form>
+        </div>`).join('');
+    }
+  }
+
+  // --- UPCOMING ---
+  const upcomingEl = document.querySelector('#upcoming .booking-list');
+  if (upcomingEl) {
+    if (!data.upcoming.length) {
+      upcomingEl.innerHTML = '<p class="empty-msg">No upcoming appointments.</p>';
+    } else {
+      upcomingEl.innerHTML = data.upcoming.map(b => `
+        <div class="booking-row">
+          <div class="patient-av">${b.patient[0].toUpperCase()}</div>
+          <div class="booking-info">
+            <div class="booking-name">${b.patient}</div>
+            <div class="booking-time">&#9200; ${b.time}</div>
+          </div>
+          <form method="POST" action="/complete-booking/${b.id}/" style="display:inline;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrf()}">
+            <button type="submit" class="btn-sm btn-edit">&#10003; Complete</button>
+          </form>
+          <form method="POST" action="/update-booking-status/${b.id}/" style="display:inline;margin-left:6px;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrf()}">
+            <button type="submit" name="status" value="cancelled" class="btn-sm btn-del">&#10006; Cancel</button>
+          </form>
+        </div>`).join('');
+    }
+  }
+
+  // --- HISTORY ---
+  const historyEl = document.querySelector('#history tbody');
+  if (historyEl) {
+    if (!data.history.length) {
+      historyEl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">No history yet.</td></tr>';
+    } else {
+      historyEl.innerHTML = data.history.map(b => `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:10px;">
+            <div class="patient-av" style="width:30px;height:30px;font-size:11px;">${b.patient[0].toUpperCase()}</div>
+            ${b.patient}
+          </div></td>
+          <td>${b.time}</td>
+          <td>30 min</td>
+          <td><span class="status-chip status-${b.status}">${b.status.charAt(0).toUpperCase()+b.status.slice(1)}</span></td>
+        </tr>`).join('');
+    }
+  }
+
+  // --- NOTIFICATIONS ---
+  const notifEl = document.querySelector('#notifications .notif-list');
+  if (notifEl) {
+    if (!data.notifications.length) {
+      notifEl.innerHTML = '<p class="empty-msg">No notifications.</p>';
+    } else {
+      notifEl.innerHTML = data.notifications.map(n => `
+        <div class="notif-item">
+          <div class="notif-dot ${n.is_read ? 'old' : 'new'}"></div>
+          <div>
+            <div class="notif-text">${n.message}</div>
+            <div class="notif-time">${n.time}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+setInterval(() => {
+  fetch(POLL_URL, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(r => r.json())
+    .then(renderDoctor)
+    .catch(() => {});
+}, 5000);
+</script>
+</body>
+</html>

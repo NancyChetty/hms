@@ -1,0 +1,16 @@
+service: email-service
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+
+plugins:
+  - serverless-offline
+
+functions:
+  sendEmail:
+    handler: handler.sendEmail
+    events:
+      - http:
+          path: send-email
+          method: post

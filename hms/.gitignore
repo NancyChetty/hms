@@ -1,0 +1,25 @@
+# Secrets
+token.json
+credentials.json
+config/settings.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.env
+
+# Django
+*.log
+db.sqlite3
+media/
+
+# Node
+node_modules/

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare — Patient Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --teal-pale: #f0fdfa;
+    --cream: #f1f5f9;
+    --slate: #334155;
+    --muted: #94a3b8;
+    --border: #e2e8f0;
+    --white: #ffffff;
+    --sidebar-w: 260px;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --indigo: #6366f1;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); background: var(--navy);
+    min-height: 100vh; position: fixed; top: 0; left: 0;
+    display: flex; flex-direction: column; z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .logo-text { font-family: 'Playfair Display', serif; color: white; font-size: 20px; }
+  .sidebar-nav { flex: 1; padding: 20px 12px; }
+  .nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 12px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 10px;
+    color: rgba(255,255,255,0.55); text-decoration: none;
+    font-size: 14px; margin-bottom: 3px; transition: all 0.15s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+  .nav-item.active { background: rgba(13,148,136,0.2); color: var(--teal-light); }
+  .nav-item .icon { font-size: 17px; width: 22px; text-align: center; }
+  .sidebar-profile {
+    padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--indigo), #8b5cf6);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 15px; flex-shrink: 0;
+  }
+  .profile-name { color: white; font-size: 13px; font-weight: 500; }
+  .profile-role { color: rgba(255,255,255,0.35); font-size: 11px; }
+  .logout-btn { color: rgba(255,255,255,0.3); font-size: 16px; cursor: pointer; text-decoration: none; transition: color 0.2s; margin-left: auto; }
+  .logout-btn:hover { color: var(--red); }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+  .topbar {
+    background: white; padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .notif-btn {
+    position: relative; background: #f8fafc; border: none; cursor: pointer;
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .notif-badge { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 1.5px solid white; }
+  .content { padding: 32px; }
+
+  /* WELCOME HERO */
+  .welcome-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #0f2447 50%, #0d3b5e 100%);
+    border-radius: 20px; padding: 36px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; position: relative; overflow: hidden;
+  }
+  .welcome-hero::before {
+    content: '';
+    position: absolute; width: 300px; height: 300px;
+    border-radius: 50%; border: 1px solid rgba(13,148,136,0.2);
+    right: -60px; top: -80px;
+  }
+  .welcome-hero::after {
+    content: '';
+    position: absolute; width: 180px; height: 180px;
+    border-radius: 50%; border: 1px solid rgba(13,148,136,0.15);
+    right: 80px; bottom: -60px;
+  }
+  .welcome-text { position: relative; z-index: 1; }
+  .welcome-greeting { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 6px; }
+  .welcome-name { font-family: 'Playfair Display', serif; font-size: 30px; color: white; margin-bottom: 10px; }
+  .welcome-sub { color: rgba(255,255,255,0.5); font-size: 14px; max-width: 360px; line-height: 1.6; }
+  .welcome-illustration { font-size: 80px; position: relative; z-index: 1; opacity: 0.85; }
+
+  /* ALERTS / MESSAGES */
+  .messages { margin-bottom: 20px; }
+  .msg { padding: 12px 18px; border-radius: 10px; background: var(--teal-pale); border-left: 4px solid var(--teal); color: var(--teal); font-size: 14px; margin-bottom: 8px; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+  .stat-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+  .stat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .stat-icon.teal { background: var(--teal-pale); }
+  .stat-icon.amber { background: #fffbeb; }
+  .stat-icon.green { background: #f0fdf4; }
+  .stat-icon.indigo { background: #eef2ff; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--navy); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* GRID */
+  .grid-main { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+  .card { background: white; border-radius: 16px; padding: 24px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--navy); }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-teal { background: var(--teal-pale); color: var(--teal); }
+  .badge-amber { background: #fffbeb; color: var(--amber); }
+  .badge-red { background: #fef2f2; color: var(--red); }
+  .badge-blue { background: #eff6ff; color: #3b82f6; }
+  .badge-indigo { background: #eef2ff; color: var(--indigo); }
+
+  /* DOCTOR SLOTS */
+  .doctor-card {
+    border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; transition: all 0.2s;
+  }
+  .doctor-card:hover { border-color: var(--teal); box-shadow: 0 4px 20px rgba(13,148,136,0.1); }
+  .doctor-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .doc-av {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 16px;
+  }
+  .doc-name { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .doc-spec { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .slot-time-row { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border-radius: 10px; padding: 10px 14px; }
+  .slot-time-text { font-size: 13px; color: var(--slate); }
+  .book-btn {
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    color: white; border: none; padding: 7px 16px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    cursor: pointer; text-decoration: none; transition: all 0.2s;
+  }
+  .book-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(13,148,136,0.3); }
+  .empty-msg { color: var(--muted); font-size: 14px; text-align: center; padding: 30px; }
+
+  /* UPCOMING CHECKUPS */
+  .checkup-item { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #f8fafc; }
+  .checkup-item:last-child { border-bottom: none; }
+  .checkup-date { width: 42px; height: 42px; background: var(--teal-pale); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+  .checkup-day { font-size: 16px; font-weight: 700; color: var(--teal); line-height: 1; }
+  .checkup-mon { font-size: 9px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; }
+  .checkup-info { flex: 1; }
+  .checkup-doc { font-size: 13px; color: var(--navy); font-weight: 500; }
+  .checkup-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* NOTIFICATIONS SIDE */
+  .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f8fafc; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .notif-dot.new { background: var(--teal); }
+  .notif-dot.old { background: #e2e8f0; }
+  .notif-text { font-size: 12px; color: var(--slate); line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .sidebar-col { display: flex; flex-direction: column; gap: 20px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚕️</div>
+    <span class="logo-text">MediCare</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Menu</div>
+    <a class="nav-item active" href="#"><span class="icon">🏠</span> Dashboard</a>
+    <a class="nav-item" href="#doctors"><span class="icon">👨‍⚕️</span> Find Doctors</a>
+    <a class="nav-item" href="#bookings"><span class="icon">📋</span> My Bookings</a>
+    <a class="nav-item" href="#checkups"><span class="icon">🩺</span> Upcoming</a>
+    <div class="nav-section-label">Account</div>
+    <a class="nav-item" href="#"><span class="icon">👤</span> Profile</a>
+    <a class="nav-item" href="#notifs"><span class="icon">🔔</span> Notifications</a>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="avatar">{{ request.user.username|first|upper }}</div>
+    <div>
+      <div class="profile-name">{{ request.user.username }}</div>
+      <div class="profile-role">Patient</div>
+    </div>
+    <a class="logout-btn" href="/logout/">↪</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <span class="topbar-title">Patient Dashboard</span>
+    <div class="topbar-right">
+      <button class="notif-btn">🔔<span class="notif-badge"></span></button>
+      <div class="avatar" style="width:36px;height:36px;font-size:14px;">{{ request.user.username|first|upper }}</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="msg">ℹ️ {{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- WELCOME HERO -->
+    <div class="welcome-hero">
+      <div class="welcome-text">
+        <div class="welcome-greeting">Good day 👋</div>
+        <div class="welcome-name">{{ request.user.username }}</div>
+        <div class="welcome-sub">Welcome back to MediCare. Browse available doctors and manage your upcoming appointments.</div>
+      </div>
+      <div class="welcome-illustration">🏥</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon teal">📅</div>
+        <div><div class="stat-num" id="stat-mybookings">{{ my_bookings|length }}</div><div class="stat-label">My Bookings</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">👨‍⚕️</div>
+        <div><div class="stat-num" id="stat-availslots">{{ slots|length }}</div><div class="stat-label">Available Slots</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">🩺</div>
+        <div><div class="stat-num" id="stat-upcoming">{{ my_bookings|length }}</div><div class="stat-label">Upcoming</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon indigo">✅</div>
+        <div><div class="stat-num" id="stat-completed">0</div><div class="stat-label">Completed</div></div>
+      </div>
+    </div>
+
+    <div class="grid-main">
+      <!-- LEFT: Doctors + My Bookings -->
+      <div>
+        <!-- AVAILABLE DOCTORS -->
+        <div class="card" id="doctors" style="margin-bottom:24px;">
+          <div class="card-header">
+            <span class="card-title">Available Doctors</span>
+            <span class="badge badge-teal">{{ slots|length }} Slots</span>
+          </div>
+          {% for slot in slots %}
+          <div class="doctor-card">
+            <div class="doctor-top">
+              <div class="doc-av">{{ slot.doctor.username|first|upper }}</div>
+              <div>
+                <div class="doc-name">Dr. {{ slot.doctor.username }}</div>
+                <div class="doc-spec">General Physician · MediCare</div>
+              </div>
+              <span class="badge badge-teal" style="margin-left:auto;">Available</span>
+            </div>
+            <div class="slot-time-row">
+              <div>
+                <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Time Slot</div>
+                <div class="slot-time-text">🕐 {{ slot.start_time }} — {{ slot.end_time }}</div>
+              </div>
+              <a href="{% url 'book_slot' slot.id %}" class="book-btn">Book Appointment</a>
+            </div>
+          </div>
+          {% empty %}
+          <p class="empty-msg">No slots available right now.</p>
+          {% endfor %}
+        </div>
+
+        <!-- MY BOOKINGS -->
+        <div class="card" id="bookings">
+          <div class="card-header">
+            <span class="card-title">My Bookings</span>
+            <span class="badge badge-blue">{{ my_bookings|length }}</span>
+          </div>
+          <div class="booking-list">
+          {% for booking in my_bookings %}
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f8fafc;">
+            <div class="doc-av" style="width:38px;height:38px;font-size:14px;">{{ booking.slot.doctor.username|first|upper }}</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:500;color:var(--navy)">Dr. {{ booking.slot.doctor.username }}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">⏰ {{ booking.slot.start_time }}</div>
+            </div>
+            {% if booking.status == 'pending' %}
+              <span class="badge badge-amber">Pending</span>
+            {% elif booking.status == 'confirmed' %}
+              <span class="badge badge-teal">Confirmed</span>
+            {% elif booking.status == 'cancelled' %}
+              <span class="badge badge-red">Cancelled</span>
+            {% elif booking.status == 'completed' %}
+              <span class="badge" style="background:#f0fdf4;color:#10b981;">Completed</span>
+            {% endif %}
+            {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+            <form method="POST" action="{% url 'cancel_booking' booking.id %}" style="margin-left:6px;">
+              {% csrf_token %}
+              <button type="submit" class="book-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);font-size:11px;padding:5px 12px;">Cancel</button>
+            </form>
+            {% endif %}
+          </div>
+          {% empty %}
+          <p class="empty-msg">No bookings yet.</p>
+          {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="sidebar-col">
+
+        <!-- UPCOMING CHECKUPS -->
+        <div class="card" id="checkups">
+          <div class="card-header">
+            <span class="card-title">Upcoming Checkups</span>
+            <span class="badge badge-amber">{{ my_bookings|length }}</span>
+          </div>
+          <div class="checkup-list">
+          {% for booking in my_bookings %}
+            {% if booking.status == 'confirmed' %}
+            <div class="checkup-item">
+              <div class="checkup-date">
+                <span class="checkup-day">{{ booking.slot.start_time|date:"d" }}</span>
+                <span class="checkup-mon">{{ booking.slot.start_time|date:"M" }}</span>
+              </div>
+              <div class="checkup-info">
+                <div class="checkup-doc">Dr. {{ booking.slot.doctor.username }}</div>
+                <div class="checkup-time">{{ booking.slot.start_time|date:"h:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+          {% empty %}
+          <p class="empty-msg" style="padding:20px 0;">No upcoming checkups.</p>
+          {% endfor %}
+          </div>
+        </div>
+        <div class="card" id="notifs">
+          <div class="card-header">
+            <span class="card-title">Notifications</span>
+            <span class="badge badge-red">{{ notifications|length }}</span>
+          </div>
+          <div class="notif-list">
+          {% for notif in notifications %}
+          <div class="notif-item">
+            <div class="notif-dot {% if not notif.is_read %}new{% else %}old{% endif %}"></div>
+            <div>
+              <div class="notif-text">{{ notif.message }}</div>
+              <div class="notif-time">{{ notif.created_at|timesince }} ago</div>
+            </div>
+          </div>
+          {% empty %}
+          <p class="empty-msg" style="padding:20px 0;">No notifications.</p>
+          {% endfor %}
+          </div>
+        </div>
+
+        <!-- PROFILE CARD -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">My Profile</span>
+            <a href="#" style="font-size:12px;color:var(--teal);text-decoration:none;">Edit</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div class="avatar" style="width:50px;height:50px;font-size:20px;border-radius:14px;">{{ request.user.username|first|upper }}</div>
+            <div>
+              <div style="font-weight:600;font-size:15px;color:var(--navy)">{{ request.user.username }}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Patient ID #10{{ request.user.id }}</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="background:#f8fafc;border-radius:9px;padding:11px;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--navy)">{{ my_bookings|length }}</div>
+              <div style="font-size:11px;color:var(--muted);">Bookings</div>
+            </div>
+            <div style="background:#f8fafc;border-radius:9px;padding:11px;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--navy)">0</div>
+              <div style="font-size:11px;color:var(--muted);">Completed</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+</div>
+</div>
+
+<script>
+const POLL_URL = "{% url 'dashboard_poll' %}";
+
+function getCsrf() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : '';
+}
+
+const STATUS_BADGE = {
+  pending:   '<span class="badge badge-amber">Pending</span>',
+  confirmed: '<span class="badge badge-teal">Confirmed</span>',
+  cancelled: '<span class="badge badge-red">Cancelled</span>',
+  completed: '<span class="badge" style="background:#f0fdf4;color:#10b981;">Completed</span>',
+};
+
+function renderPatient(data) {
+
+  // --- STATS ---
+  if (data.stats) {
+    document.getElementById('stat-mybookings').textContent = data.stats.my_bookings;
+    document.getElementById('stat-availslots').textContent = data.stats.available_slots;
+    document.getElementById('stat-upcoming').textContent   = data.stats.upcoming;
+    document.getElementById('stat-completed').textContent  = data.stats.completed;
+  }
+
+  // --- MY BOOKINGS ---
+  const bookingsEl = document.querySelector('#bookings .booking-list');
+  if (bookingsEl) {
+    if (!data.my_bookings.length) {
+      bookingsEl.innerHTML = '<p class="empty-msg">No bookings yet.</p>';
+    } else {
+      bookingsEl.innerHTML = data.my_bookings.map(b => `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f8fafc;">
+          <div class="doc-av" style="width:38px;height:38px;font-size:14px;">${b.doctor[0].toUpperCase()}</div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:500;color:var(--navy)">Dr. ${b.doctor}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">&#9200; ${b.time}</div>
+          </div>
+          ${STATUS_BADGE[b.status] || ''}
+          ${(b.status === 'pending' || b.status === 'confirmed') ? `
+          <form method="POST" action="/cancel-booking/${b.id}/" style="margin-left:6px;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrf()}">
+            <button type="submit" class="book-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);font-size:11px;padding:5px 12px;">Cancel</button>
+          </form>` : ''}
+        </div>`).join('');
+    }
+  }
+
+  // --- UPCOMING CHECKUPS ---
+  const checkupsEl = document.querySelector('#checkups .checkup-list');
+  if (checkupsEl) {
+    if (!data.upcoming.length) {
+      checkupsEl.innerHTML = '<p class="empty-msg" style="padding:20px 0;">No upcoming checkups.</p>';
+    } else {
+      checkupsEl.innerHTML = data.upcoming.map(b => `
+        <div class="checkup-item">
+          <div class="checkup-date">
+            <span class="checkup-day">${b.day}</span>
+            <span class="checkup-mon">${b.mon}</span>
+          </div>
+          <div class="checkup-info">
+            <div class="checkup-doc">Dr. ${b.doctor}</div>
+            <div class="checkup-time">${b.time}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // --- NOTIFICATIONS ---
+  const notifEl = document.querySelector('#notifs .notif-list');
+  if (notifEl) {
+    if (!data.notifications.length) {
+      notifEl.innerHTML = '<p class="empty-msg" style="padding:20px 0;">No notifications.</p>';
+    } else {
+      notifEl.innerHTML = data.notifications.map(n => `
+        <div class="notif-item">
+          <div class="notif-dot ${n.is_read ? 'old' : 'new'}"></div>
+          <div>
+            <div class="notif-text">${n.message}</div>
+            <div class="notif-time">${n.time}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+setInterval(() => {
+  fetch(POLL_URL, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(r => r.json())
+    .then(renderPatient)
+    .catch(() => {});
+}, 5000);
+</script>
+
+</body>
+</html>

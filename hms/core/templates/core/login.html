@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --cream: #f8f5f0;
+    --slate: #334155;
+    --muted: #94a3b8;
+    --white: #ffffff;
+    --error: #ef4444;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+  .left-panel {
+    flex: 1;
+    background: linear-gradient(135deg, #0a1628 0%, #0f2447 50%, #0d3b5e 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    border: 1px solid rgba(13,148,136,0.15);
+    top: -100px; left: -100px;
+    animation: pulse 6s ease-in-out infinite;
+  }
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(13,148,136,0.1);
+    bottom: 50px; right: -50px;
+    animation: pulse 8s ease-in-out infinite reverse;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.05);opacity:1} }
+  .brand { position: relative; z-index: 1; text-align: center; }
+  .brand-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 36px;
+    box-shadow: 0 20px 60px rgba(13,148,136,0.4);
+  }
+  .brand h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: var(--white);
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+  .brand p {
+    color: rgba(255,255,255,0.5);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    max-width: 280px;
+    line-height: 1.7;
+  }
+  .stats {
+    display: flex; gap: 40px;
+    margin-top: 60px;
+    position: relative; z-index: 1;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--teal-light);
+    display: block;
+  }
+  .stat-label { color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .right-panel {
+    width: 480px;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 50px;
+  }
+  .form-header { margin-bottom: 40px; }
+  .form-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .form-header p { color: var(--muted); font-size: 14px; }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--slate); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--navy);
+    background: var(--white);
+    transition: all 0.2s;
+    outline: none;
+  }
+  input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(13,148,136,0.1); }
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--teal), #0891b2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(13,148,136,0.35); }
+  .signup-link { text-align: center; margin-top: 28px; font-size: 14px; color: var(--muted); }
+  .signup-link a { color: var(--teal); text-decoration: none; font-weight: 500; }
+  @media (max-width: 768px) { .left-panel { display: none; } .right-panel { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="left-panel">
+  <div class="brand">
+    <div class="brand-icon">⚕️</div>
+    <h1>MediCare</h1>
+    <p>Advanced hospital management platform for modern healthcare professionals.</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-num">2.4k</span><span class="stat-label">Doctors</span></div>
+    <div class="stat"><span class="stat-num">18k</span><span class="stat-label">Patients</span></div>
+    <div class="stat"><span class="stat-num">99.9%</span><span class="stat-label">Uptime</span></div>
+  </div>
+</div>
+<div class="right-panel">
+  <div class="form-header">
+    <h2>Welcome back</h2>
+    <p>Sign in to your account to continue</p>
+  </div>
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Enter your username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Enter your password">
+    </div>
+    <button type="submit" class="btn-primary">Sign In</button>
+  </form>
+  <p class="signup-link">Don't have an account? <a href="/signup/">Create one</a></p>
+</div>
+</body>
+</html>
